@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>アウトプット</title>
+	<meta name="robots" content="noindex" />
+    <meta name="description" content="サンプルテンプレート">
+    <meta name="keywords" content="レストラン,フレンチ,原宿">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <link rel="stylesheet" href="common.css">
+	<link rel="stylesheet" href="parts_module.css">
+    <link href="css/reset.css" rel="stylesheet" type="text/css">
+    <link href="css/validate.css" rel="stylesheet" type="text/css">
+    <link href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" rel="stylesheet">
+	<script src="https://unpkg.com/vue@2.5.13/dist/vue.min.js"></script>
+	<script src="validate/jquery.js"></script>
+	<script src="parts_module.js"></script>
+	<script type="text/javascript" src="js/jquery.js"></script>
+</head>
+<body>
+	<?php include('header.html'); ?>
+<main>
+	<div class="profBox" id="formarea">
+		
+		<h1>メールフォーム</h1>
+		
+		<dl>
+			<dt>メールアドレス※</dt>
+			<dd>
+				<div>
+					<input type="text" name="mailarea"  placeholder="info@startout.work" class="inputText mailarea" />
+					<!--メール確認-->
+					<div class="mailareaConfirmation"></div>
+					<!--メールエラー-->
+					<div class="missmailbox"></div>
+				</div>
+			</dd>
+		</dl>
+		<dl>
+			<dt>お名前※</dt>
+			<dd>
+				<div>
+					<input type="text" name="namedata"  placeholder="例) 佐々木 太郎" class="inputText namearea" />
+					<div class="namedataConfirmation"></div>
+					<div class="missnamebox"></div>
+				</div>
+			</dd>
+		</dl>
+		<dl>
+			<dt>備考</dt>
+			<dd>
+				<div>
+					<textarea name="textboxdata" class="textboxdata textboxarea"></textarea>
+					<div class="textboxdataConfirmation"></div>
+				</div>
+			</dd>
+		</dl>
+		
+		<!--入力時ボタン-->
+		<div class="makesurebox">
+			<button class="btnStyle1 submitarea">確認</button>
+		</div>	
+		
+		<!--確認時ボタン-->
+		<div class="delatearea backandsendbox">
+			<button class="btnStyle1 backBtnArea mgb10px">戻る</button>
+			<button class="btnStyle1 sendBtnArea">送信</button>
+		</div>
+		
+	</div>
+	
+</main>
+
+	<script>
+		
+		let mailmiss = "true";
+		let namemiss = "true";
+		
+		let mailarea = "";
+		let namearea = "";
+		let textboxarea = "";
+		
+		//確認ボタン
+		$(".submitarea").click(function(){
+			
+			//非表示
+			$(".missmailbox").text("");
+			$(".missnamebox").text("");
+			
+			//一旦trueにリセット
+			mailmiss = "true";
+			namemiss = "true";
+			
+			//格納
+			mailarea = $("input[name='mailarea']").val();
+			namearea = $("input[name='namedata']").val();
+			textboxarea = $("textarea[name='textboxdata']").val();
+			
+			//エラーチェック
+			if(!mailarea){
+				$(".missmailbox").text("メールアドレスが入力されていません。");	
+			}else if(mailarea.match(/.+@.+\..+/)==null){
+				$(".missmailbox").text("メールアドレスの形式が間違っています。");
+			}else{
+				//エラーなし
+				mailmiss = "false";
+			};
+			
+			if(!namearea){
+				//名前なし
+				$(".missnamebox").text("お名前が入力されていません。");	
+			}else{
+				//エラーなし
+				namemiss = "false";
+			};
+			
+			//両方エラーなし
+			if(mailmiss == "false" && namemiss == "false"){
+				
+				//入力内容
+				$(".mailareaConfirmation").text(mailarea);
+				$(".namedataConfirmation").text(namearea);
+				$(".textboxdataConfirmation").text(textboxarea);	
+				
+				//非表示
+				$(".mailarea").addClass("delatearea");
+				$(".namearea").addClass("delatearea");
+				$(".textboxdata").addClass("delatearea");
+				$(".makesurebox").addClass("delatearea");
+				
+				//戻る&送信表示
+				$(".backandsendbox").removeClass("delatearea");
+				
+			};
+			
+		});
+		
+		//戻るボタン
+		$(".backBtnArea").click(function(){
+			
+			//非表示
+			$(".mailareaConfirmation").text("");
+			$(".namedataConfirmation").text("");
+			$(".textboxdataConfirmation").text("");
+			
+			//フォーム表示
+			$(".mailarea").removeClass("delatearea");
+			$(".namearea").removeClass("delatearea");
+			$(".textboxdata").removeClass("delatearea");
+			$(".makesurebox").removeClass("delatearea");
+			
+			//戻る&送信非表示
+			$(".backandsendbox").addClass("delatearea");
+			
+		});
+		
+		
+		//送信
+		$(".sendBtnArea").click(function(){
+			
+			//データ
+			$.ajax({
+				type: 'POST',
+				dataType:'json',
+				url:'functions/mail.php',
+				data:{
+					mailarea:mailarea,
+					namearea:namearea,
+					textboxarea:textboxarea,
+				},
+				success:function(data) {
+					//成功時アラート
+					alert(data)
+					//トップページ
+					location.href = "./";
+				},
+				error:function(XMLHttpRequest, textStatus, errorThrown) {
+					//エラーアラート
+					alert(errorThrown);
+				}
+			});
+			
+		});
+		
+	</script>
+	
+	
+<?php include('footer.html'); ?>
+	
+	
+	
+</body>
+</html>
